@@ -10,12 +10,11 @@ async function retrieveUserData(queryName, password) {
 
     // Create a MongoDB client
     const client = new MongoClient(mongoURI, {});
-
-    dataExist = false;
+    let dataExist = false;
 
     try {
         await client.connect();
-        console.log("Connected to MongoDB");
+        //console.log("Connected to MongoDB");
 
         const db = client.db("Workflow_collection");
 
@@ -25,21 +24,24 @@ async function retrieveUserData(queryName, password) {
 
         const results = await collection.find(query).toArray();
 
-        if (results.length == 0)
-            console.log("No user found. Returning false")
+        if (results.length == 0){
+            //console.log("No user found. Returning false")
+        }
         else {
             user = results[0];
             if (user.password === password)
                 dataExist = true;
-            else
-                console.log("Invalid password. Returning false");
+            else{
+                //console.log("Invalid password. Returning false");
+            }
         }
     } finally {
         await client.close();
-        console.log("Connection closed");
+        //console.log("Connection closed");
     }
-    console.log(dataExist);
+    //console.log(dataExist);
     return dataExist;
 }
 
-retrieveUserData("hihihi","kokokok");
+module.exports = retrieveUserData;
+//retrieveUserData("hihihi","kokokok");
