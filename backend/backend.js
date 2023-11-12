@@ -31,7 +31,7 @@ async function retrieveData(queryName, collectionName) {
         if (collectionName === "workspaces") {
             for (const result of results) {
                 paths = result.paths;
-                // console.log(paths);
+                console.log(paths);
             }
         } else {
             for (const result of results) {
@@ -40,9 +40,9 @@ async function retrieveData(queryName, collectionName) {
         }
     } finally {
         await client.close();
-        //console.log("Connection closed");
+        console.log("Connection closed");
     }
     return paths || workspaces;
 }
-
+retrieveData("skdajksada_hihi", "workspaces");
 module.exports = retrieveData;

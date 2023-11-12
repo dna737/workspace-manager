@@ -170,14 +170,7 @@ async function main(newUser = false) {
             },
         });
         const files = null;
-<<<<<<< HEAD
         cl.note("Now, please put in all the files you need for the workspace (pdf, docx, java, etc.). A dialog should open soon", 'Next steps');
-=======
-        cl.note(
-            "Now, please put in all the files you need for the workspaces (pdf, docx, java, etc.). A dialog should open soon",
-            "Next steps"
-        );
->>>>>>> main
         try {
             const files = await selectFiles();
             return { workspaceName: name, paths: files };
@@ -199,28 +192,16 @@ async function main(newUser = false) {
             options: options,
         });
 
-<<<<<<< HEAD
         if (workspaceChoose === "goBack") //skip opening part
             return
             
         cl.outro("Opening...")
-        for (let i = 0; i <user["workspaces"].indexOf(workspaceChoose) newSpace["paths"].length; i++) {
-            // const cmd =
-            //     `start "" "` + newSpace["paths"][i].replaceAll("\\", "\\\\") + `"`;
-            // console.log(cmd);
-=======
-        if (workspaceChoose === "goBack")
-            //skip opening part
-            return;
-
-        cl.outro("Opening...");
-        for (let i = 0; i < newSpace["paths"].length; i++) {
+        let paths = await retrieveData(workspaceChoose, "workspaces")
+        console.log(workspaceChoose)
+        for (let i = 0; i < paths.length; i++) {
             const cmd =
-                `start "" "` +
-                newSpace["paths"][i].replaceAll("\\", "\\\\") +
-                `"`;
-            console.log(cmd);
->>>>>>> main
+                 `start "" "` + paths["paths"][i].replaceAll("\\", "\\\\") + `"`;
+            // console.log(cmd);
             child.exec(cmd, (err, stdout, stderr) => {
                 if (err) {
                     console.error(`exec error: ${err}`);
@@ -235,6 +216,7 @@ async function main(newUser = false) {
     }
     let newSpace = null;
     user["workspaces"] = []
+    console.log(user)
     uploadData(user, "users");
 
     console.clear();
@@ -291,10 +273,11 @@ async function main(newUser = false) {
         } else{ //createWork
             newUser = false //new or old user become old when created new workspace
             newSpace = await workspaceCreation();
-            user["workspaces"].push(newSpace["workspaceName"])
-            console.log(user["workspaces"])
-            updateData(user["username"], "users", { workspaces: user["workspaces"]})  //update the user data with the new workspace to MongoDB
+            console.log(newSpace)
             uploadData(newSpace, "workspaces"); //upload the workspaces data to MongoDB
+            newSpace["workspaceName"] = user["username"] + "_" + newSpace["workspaceName"] 
+            user["workspaces"].push(newSpace["workspaceName"] )
+            updateData(user["username"], "users", { workspaces: user["workspaces"]})  //update the user data with the new workspace to MongoDB
             cl.outro("Creation complete!")
             setTimeout(2000)
         }
