@@ -1,6 +1,6 @@
 import * as cl from "@clack/prompts";
 import color from "picocolors";
-import { createUserData, createWorkspaceData } from "./sendData";
+import uploadData from "./backend/sendToDatabase";
 
 let user = null;
 let response = null;
@@ -35,7 +35,7 @@ async function accountCreation() {
     user = { username: username, password: password };
 
     //work on sending the data to the DB.
-    createUserData(user);
+    uploadData(user, "users");
     return "OK";
 }
 
