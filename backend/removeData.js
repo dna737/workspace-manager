@@ -1,8 +1,15 @@
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
 const { collection } = require("./Schemas/Workspace");
+const retrieveData = require("./backend");
 
-async function retrieveData(queryName, collectionName) {
+async function removeData(queryName, collectionName) {
+    const dataExists = await retrieveData(queryName, "workspaces");
+
+    if (!dataExists) {
+        console.log("Data doesn't exist. Skipping remove.");
+        return;
+    }
 
     const mongoURI = process.env.MONGO_URI || "-1";
 
@@ -19,23 +26,13 @@ async function retrieveData(queryName, collectionName) {
 
         const query = { workspaceName: queryName };
 
-        const results = await collection.find(query).toArray();
-
-        if (results.length == 0)
-            return false;
-
-        for (const result of results) {
-            const paths = result.paths;
-            console.log(paths);
-        }
-
-    } finally {
+        const result = await collection.deleteOne(query);
+        console.log(`Deleted ${result.deletedCount} document`);
+    }
+    finally {
         await client.close();
         console.log("Connection closed");
     }
-    return true;
 }
 
-//retrieveData("jf83lsi890--workspace2", "workspaces");
-retrieveData("3qliuvbwlriey-esl118", "workspaces");
-module.exports = retrieveData;
+removeData("3qliuvbwlriey-esl118", "workspaces")
