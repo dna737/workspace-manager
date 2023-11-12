@@ -12,7 +12,7 @@ async function retrieveData(queryName, collectionName) {
 
     try {
         await client.connect();
-        console.log("Connected to MongoDB");
+        //console.log("Connected to MongoDB");
 
         const db = client.db("Workflow_collection");
 
@@ -34,7 +34,7 @@ async function retrieveData(queryName, collectionName) {
 
     } finally {
         await client.close();
-        console.log("Connection closed");
+        //console.log("Connection closed");
     }
     return paths;
 }
