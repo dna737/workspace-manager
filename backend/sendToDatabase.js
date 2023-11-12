@@ -8,8 +8,8 @@ const newWorkspace = new Workspace({
     paths: ["~/Desktop/essay.txt", "~/Desktop/rubric.txt"],
 });
 
-async function uploadData(jsonData) {
-    const dataExists = await retrieveData(jsonData.workspaceName, "workspaces");
+async function uploadData(jsonData, collectionName) {
+    const dataExists = await retrieveData(jsonData.workspaceName, collectionName);
 
     if (dataExists) {
         console.log("Data already exists. Skipping upload.");
@@ -26,7 +26,7 @@ async function uploadData(jsonData) {
 
         const db = client.db("Workflow_collection");
 
-        const collection = db.collection("workspaces");
+        const collection = db.collection(collectionName);
         const result = await collection.insertOne(jsonData);
 
         console.log(`Inserted ${result.insertedCount} documents`);
@@ -36,4 +36,4 @@ async function uploadData(jsonData) {
     }
 }
 
-uploadData(newWorkspace);
+uploadData(newWorkspace, "workspaces");
