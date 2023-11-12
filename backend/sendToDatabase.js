@@ -1,7 +1,6 @@
 require("dotenv").config();
 const Workspace = require("./Schemas/Workspace");
 const MongoClient = require("mongodb").MongoClient;
-const retrieveData = require("./backend");
 
 const newWorkspace = new Workspace({
     workspaceName: "3qliuvbwlriey-esl118",
@@ -9,12 +8,6 @@ const newWorkspace = new Workspace({
 });
 
 async function uploadData(jsonData, collectionName) {
-    const dataExists = await retrieveData(jsonData.workspaceName, collectionName);
-
-    if (dataExists) {
-        console.log("Data already exists. Skipping upload.");
-        return;
-    }
 
     const mongoURI = process.env.MONGO_URI;
 
@@ -27,9 +20,22 @@ async function uploadData(jsonData, collectionName) {
         const db = client.db("Workflow_collection");
 
         const collection = db.collection(collectionName);
-        const result = await collection.insertOne(jsonData);
+        
+        //Check if data exists
+        query = null;
+        if (collectionName == "workspaces")
+            query = { workspaceName: jsonData.workspaceName };
+        else if (collectionName == "user")
+            query = { username: jsonData.workspaceName};
 
-        console.log(`Inserted ${result.insertedCount} documents`);
+        const results = await collection.find(query).toArray();
+        if (results.length != 0)
+            console.log("Data already exists. Skipping upload.");
+        else {
+            const result = await collection.insertOne(jsonData);
+            console.log(`Inserted ${result.insertedCount} documents`);
+        }
+        
     } finally {
         await client.close();
         console.log("Connection closed");
