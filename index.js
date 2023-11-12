@@ -4,6 +4,7 @@ import * as child from "child_process";
 import uploadData from "./backend/sendToDatabase.js";
 import { setTimeout } from "node:timers/promises";
 import retrieveData from "./backend/backend.js";
+import retrieveUserData from "./backend/retrieveUserData.js";
 
 let user = null;
 let response = null;
@@ -35,7 +36,7 @@ async function accountCreation() {
         cl.cancel("Operation cancelled.");
         return "Restart";
     }
-    user = { username: username, password: password, workspaces: [] };
+    user = { username: username, password: password};
     return "OK";
 }
 
@@ -45,30 +46,37 @@ async function accountLogIn() {
             color.red("Welcome back! Please input the following info:")
         )}`
     );
-    const username = await cl.text({
-        message: "What is your username:",
-        validate(value) {
-            if (value.length === 0) return `Username is required!`;
-        },
-    });
-    if (cl.isCancel(username)) {
-        cl.cancel("Operation cancelled.");
-        return "Restart";
-    }
+    let checkExist = false
+    do{
+        const username = await cl.text({
+            message: "What is your username:",
+            validate(value) {
+                if (value.length === 0) return `Username is required!`;
+            },
+        });
+        if (cl.isCancel(username)) {
+            cl.cancel("Operation cancelled.");
+            return "Restart";
+        }
 
-    const password = await cl.password({
-        message: "Please provide password for your account (5 characters min)",
-        validate: (value) => {
-            if (!value) return "Please enter a password.";
-            if (value.length < 5)
-                return "Password should have at least 5 characters.";
-        },
-    });
-    if (cl.isCancel(password)) {
-        cl.cancel("Operation cancelled.");
-        return "Restart";
-    }
-    user = { username: username, password: password };
+        const password = await cl.password({
+            message: "Please provide password for your account (5 characters min)",
+            validate: (value) => {
+                if (!value) return "Please enter a password.";
+                if (value.length < 5)
+                    return "Password should have at least 5 characters.";
+            },
+        });
+        if (cl.isCancel(password)) {
+            cl.cancel("Operation cancelled.");
+            return "Restart";
+        }
+
+        checkExist = await retrieveUserData(username, password)
+        if (!checkExist)
+            cl.outro("Username or password is incorrect, please try again 🥺.")
+    } while (!checkExist)
+    user = { username: username, password: password};
     return "OK";
 }
 
@@ -99,10 +107,15 @@ async function menu() {
                         label: "Sign up 📃",
                         hint: "Newbie? Don't worry, just sign up and we will help you!",
                     },
+                    {
+                        value: "exit",
+                        label: "Exit the application 🚪",
+                        hint: "Need to leave?",
+                    }
                 ],
             });
 
-            if (cl.isCancel(account)) {
+            if (cl.isCancel(account) || account == "exit") {
                 cl.outro(
                     `${color.bgBlue(color.white("Goodbye! -Madhacks Team-"))}`
                 );
@@ -196,10 +209,6 @@ async function main(newUser = false) {
     }
     let newSpace = null;
     let workspaces = []
-    if (newUser == false){
-        //getting the created workspaces
-        workspaces = retrieveData(user["username"], "users")
-    }
 
     console.clear();
     cl.intro(
@@ -210,21 +219,29 @@ async function main(newUser = false) {
         )}`
     );
 
+    if (newUser == false){
+        //getting the created workspaces
+        workspaces = retrieveData(user["username"], "users")
+    }
+
     while (true){
         const operation = [
-            { value: "newWork", label: "Create a new workspace 🆕" },
+            { value: "newWork", label: "Create a new workspace 🆕"},
             { value: "openWork", label: "Open an exisitng workspace 💻" },
             { value: "signOut", label: "Sign out 🔑"}
         ]
 
         if (newUser == false){
-            //getting the created workspaces
             if (workspaces.length == 0){ //user never created one
                 operation.splice(1, 1);
             }
         } else { //new user so no previous workspace
             operation.splice(1, 1);
-            //TODO- INTRO
+            cl.note("Welcome to your very own work-universe 🌌\n" +
+                   "Here you can create a workspace each for your task!\n" + 
+                   "Whether it's an essay with multiple pdf sources to work on to a complicated in-class coding project,\n" + 
+                   "you just need to create one and put all of your files needed, and DONE! =D\n" +
+                   "Have fun and be productive!",  '⭐ GETTING STARTED ⭐');
         }
 
         const opAnswer = await cl.select({
