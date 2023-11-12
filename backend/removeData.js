@@ -4,7 +4,7 @@ const { collection } = require("./Schemas/Workspace");
 const retrieveData = require("./backend");
 
 async function removeData(queryName, collectionName) {
-    const dataExists = await retrieveData(queryName, "workspaces");
+    const dataExists = await retrieveData(queryName, collectionName);
 
     if (!dataExists) {
         console.log("Data doesn't exist. Skipping remove.");
