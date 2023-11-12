@@ -40,6 +40,7 @@ async function uploadData(jsonData, collectionName) {
     }
 }
 
+//TODO: remove this later.
 uploadData(
     { username: "someOtherName", workspaces: ["someWorkspace"] },
     "users"
