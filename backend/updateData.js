@@ -39,10 +39,10 @@ async function updateData(queryName, collectionName, updatingData) {
     }
 }
 
-const queryName = '3qliuvbwlriey-esl118';
-const collectionName = 'workspaces';
-const updatingDataFile = {
-    paths: ["1.txt","2.txt"]
-};
+// const queryName = '3qliuvbwlriey-esl118';
+// const collectionName = 'workspaces';
+// const updatingDataFile = {
+//     paths: ["1.txt","2.txt"]
+// };
 
-updateData(queryName, collectionName, updatingDataFile);
+// updateData(queryName, collectionName, updatingDataFile);

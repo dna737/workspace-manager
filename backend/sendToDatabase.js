@@ -32,22 +32,19 @@ async function uploadData(jsonData, collectionName) {
             query = { workspaceName: completeWorkspaceName };
         } else if (collectionName === "users")
             query = { username: jsonData.users };
-        console.log(
-            "🚀 ~ file: sendToDatabase.js:40 ~ uploadData ~ query:",
-            query
-        );
 
         const results = await collection.find(query).toArray();
-        if (results.length != 0)
-            console.log("Data already exists. Skipping upload.");
+        if (results.length != 0){
+
+        }
         else {
-            console.log("jsonData:", jsonData);
+            //console.log("jsonData:", jsonData);
             const result = await collection.insertOne(jsonData);
-            console.log(`Inserted ${result.insertedCount} documents`);
+            //console.log(`Inserted ${result.insertedCount} documents`);
         }
     } finally {
         await client.close();
-        console.log("Connection closed");
+        //console.log("Connection closed");
     }
 }
 
