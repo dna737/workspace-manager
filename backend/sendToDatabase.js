@@ -1,9 +1,11 @@
 require("dotenv").config();
+const { v4: uuidv4 } = require("uuid");
 const Workspace = require("./Schemas/Workspace");
 const MongoClient = require("mongodb").MongoClient;
 
+//TODO: remove this sample workspace later.
 const newWorkspace = new Workspace({
-    workspaceName: "3qliuvbwlriey-esl118",
+    workspaceName: "randomWorkspace",
     paths: ["~/Desktop/essay.txt", "~/Desktop/rubric.txt"],
 });
 
@@ -21,22 +23,31 @@ async function uploadData(jsonData, collectionName) {
         const collection = db.collection(collectionName);
 
         //Check if data exists
-        query = null;
-        if (collectionName === "workspaces")
-            query = { workspaceName: jsonData.workspaceName };
-        else if (collectionName === "users")
+        let query = null;
+        if (collectionName === "workspaces") {
+            console.log("entered");
+            const id = uuidv4();
+            const completeWorkspaceName = id + "" + jsonData.workspaceName;
+            jsonData.workspaceName = completeWorkspaceName;
+            query = { workspaceName: completeWorkspaceName };
+        } else if (collectionName === "users")
             query = { username: jsonData.users };
+        console.log(
+            "🚀 ~ file: sendToDatabase.js:40 ~ uploadData ~ query:",
+            query
+        );
 
         const results = await collection.find(query).toArray();
         if (results.length != 0)
             console.log("Data already exists. Skipping upload.");
         else {
+            console.log("jsonData:", jsonData);
             const result = await collection.insertOne(jsonData);
-            //console.log(`Inserted ${result.insertedCount} documents`);
+            console.log(`Inserted ${result.insertedCount} documents`);
         }
     } finally {
         await client.close();
-        //console.log("Connection closed");
+        console.log("Connection closed");
     }
 }
 
@@ -48,3 +59,4 @@ uploadData(
 );*/
 
 module.exports = uploadData;
+// uploadData(newWorkspace, "workspaces");
