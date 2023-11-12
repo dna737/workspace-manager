@@ -1,7 +1,5 @@
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
-const { collection } = require("./Schemas/Workspace");
-const retrieveData = require("./backend");
 
 async function retrieveUserData(queryName, password) {
 
@@ -38,7 +36,6 @@ async function retrieveUserData(queryName, password) {
         await client.close();
         console.log("Connection closed");
     }
-    console.log(dataExist);
     return dataExist;
 }
 
