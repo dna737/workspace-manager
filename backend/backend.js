@@ -36,6 +36,6 @@ async function retrieveData(queryName, collectionName) {
     return true;
 }
 
-//retrieveData("jf83lsi890--workspace2", "workspaces");
-retrieveData("3qliuvbwlriey-esl118", "workspaces");
+retrieveData("jf83lsi890--workspace2", "workspaces");
+//retrieveData("3qliuvbwlriey-esl118", "workspaces");
 module.exports = retrieveData;
