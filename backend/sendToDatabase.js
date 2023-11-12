@@ -14,7 +14,7 @@ async function uploadData(jsonData, collectionName) {
 
     try {
         await client.connect();
-        console.log("Connected to MongoDB");
+        //console.log("Connected to MongoDB");
 
         const db = client.db("Workflow_collection");
 
@@ -22,28 +22,29 @@ async function uploadData(jsonData, collectionName) {
 
         //Check if data exists
         query = null;
-        if (collectionName == "workspaces")
+        if (collectionName === "workspaces")
             query = { workspaceName: jsonData.workspaceName };
-        else if (collectionName == "users")
-            query = { username: jsonData.workspaceName };
+        else if (collectionName === "users")
+            query = { username: jsonData.users };
 
         const results = await collection.find(query).toArray();
         if (results.length != 0)
             console.log("Data already exists. Skipping upload.");
         else {
             const result = await collection.insertOne(jsonData);
-            console.log(`Inserted ${result.insertedCount} documents`);
+            //console.log(`Inserted ${result.insertedCount} documents`);
         }
     } finally {
         await client.close();
-        console.log("Connection closed");
+        //console.log("Connection closed");
     }
 }
 
 //TODO: remove this later.
+/** 
 uploadData(
     { username: "someOtherName", workspaces: ["someWorkspace"] },
     "users"
-);
+);*/
 
 module.exports = uploadData;
