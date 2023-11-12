@@ -48,5 +48,5 @@ async function retrieveData(queryName, collectionName) {
 
 //retrieveData("jf83lsi890--workspace2", "workspaces");
 // retrieveData("fssfasf", "workspaces");
-retrieveData("hallu", "users").then((result) => console.log(result));
+//retrieveData("hallu", "users").then((result) => console.log(result));
 module.exports = retrieveData;
