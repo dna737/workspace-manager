@@ -1,5 +1,4 @@
 require("dotenv").config();
-const { v4: uuidv4 } = require("uuid");
 const Workspace = require("./Schemas/Workspace");
 const MongoClient = require("mongodb").MongoClient;
 
@@ -9,7 +8,7 @@ const newWorkspace = new Workspace({
     paths: ["~/Desktop/essay.txt", "~/Desktop/rubric.txt"],
 });
 
-async function uploadData(jsonData, collectionName) {
+async function uploadData(jsonData, collectionName, username = "") {
     const mongoURI = process.env.MONGO_URI;
 
     const client = new MongoClient(mongoURI, {});
@@ -24,12 +23,11 @@ async function uploadData(jsonData, collectionName) {
         //Check if data exists
         let query = null;
         if (collectionName === "workspaces") {
-            const id = uuidv4();
-            const completeWorkspaceName = id + "" + jsonData.workspaceName;
-            jsonData.workspaceName = completeWorkspaceName;
-            query = { workspaceName: completeWorkspaceName };
+            jsonData.workspaceName = username + jsonData.workspaceName;
+            query = { workspaceName: jsonData.workspaceName };
         } else if (collectionName === "users")
-            query = { username: jsonData.users };
+            jsonData.users = username + jsonData.users;
+        query = { username: jsonData.users };
 
         const results = await collection.find(query).toArray();
         if (results.length != 0) {
