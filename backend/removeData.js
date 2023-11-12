@@ -19,8 +19,7 @@ async function removeData(queryName, collectionName) {
         query = null;
         if (collectionName == "workspaces")
             query = { workspaceName: queryName };
-        else if (collectionName == "user")
-            query = { username: queryName};
+        else if (collectionName == "users") query = { username: queryName };
 
         const results = await collection.find(query).toArray();
         if (results.length == 0)
@@ -29,11 +28,10 @@ async function removeData(queryName, collectionName) {
             const result = await collection.deleteOne(query);
             console.log(`Deleted ${result.deletedCount} document`);
         }
-    }
-    finally {
+    } finally {
         await client.close();
         console.log("Connection closed");
     }
 }
 
-removeData("3qliuvbwlriey-esl118", "workspaces")
+removeData("3qliuvbwlriey-esl118", "workspaces");

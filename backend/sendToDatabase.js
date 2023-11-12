@@ -8,7 +8,6 @@ const newWorkspace = new Workspace({
 });
 
 async function uploadData(jsonData, collectionName) {
-
     const mongoURI = process.env.MONGO_URI;
 
     const client = new MongoClient(mongoURI, {});
@@ -20,13 +19,13 @@ async function uploadData(jsonData, collectionName) {
         const db = client.db("Workflow_collection");
 
         const collection = db.collection(collectionName);
-        
+
         //Check if data exists
         query = null;
         if (collectionName == "workspaces")
             query = { workspaceName: jsonData.workspaceName };
-        else if (collectionName == "user")
-            query = { username: jsonData.workspaceName};
+        else if (collectionName == "users")
+            query = { username: jsonData.workspaceName };
 
         const results = await collection.find(query).toArray();
         if (results.length != 0)
@@ -35,11 +34,15 @@ async function uploadData(jsonData, collectionName) {
             const result = await collection.insertOne(jsonData);
             console.log(`Inserted ${result.insertedCount} documents`);
         }
-        
     } finally {
         await client.close();
         console.log("Connection closed");
     }
 }
 
-uploadData(newWorkspace, "workspaces");
+uploadData(
+    { username: "someOtherName", workspaces: ["someWorkspace"] },
+    "users"
+);
+
+module.exports = uploadData;
