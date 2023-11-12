@@ -1,10 +1,9 @@
 import * as cl from '@clack/prompts';
+import { setTimeout } from 'node:timers/promises';
 import color from "picocolors";
 
 let user = null
 let response = null
-
-const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
 async function accountCreation(){
     cl.intro(`${color.bgYellow(color.red('Great, let start the account creation:'))}`);
@@ -47,6 +46,35 @@ async function accountCreation(){
     return "OK";
 }
 
+async function accountLogIn(){
+    cl.intro(`${color.bgYellow(color.red('Welcome back! Please input the following info:'))}`);
+
+    const username = await cl.text({ 
+        message: 'What is your username:',
+        validate(value){
+            if (value.length === 0) return `Username is required!`;
+        }, 
+    });
+    if (cl.isCancel(username)) {
+        cl.cancel('Operation cancelled.');
+        return "Restart";
+    }
+
+    const password = await cl.password({
+        message: 'Please provide password for your account (5 characters min)',
+        validate: (value) => {
+            if (!value) return 'Please enter a password.';
+            if (value.length < 5) return 'Password should have at least 5 characters.';
+        },
+    });
+    if (cl.isCancel(password)) {
+        cl.cancel('Operation cancelled.');
+        return "Restart";
+    }
+    user = {"username": username, "password": password}
+    return "OK";
+}
+
 async function main(){
     do {
         console.clear()
@@ -71,11 +99,6 @@ async function main(){
         } else 
             break;
     } while (response != "OK")
-
-    const s = cl.spinner();
-    s.start('Starting your workspace');
-    // Do installation here
-    s.stop('Done! ');
 }
 
 main().catch(console.error);
