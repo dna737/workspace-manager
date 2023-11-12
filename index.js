@@ -5,6 +5,7 @@ import uploadData from "./backend/sendToDatabase.js";
 import { setTimeout } from "node:timers/promises";
 import retrieveData from "./backend/backend.js";
 import retrieveUserData from "./backend/retrieveUserData.js";
+import updateData from "./backend/updateData.js";
 
 let user = null;
 let response = null;
@@ -165,7 +166,7 @@ async function main(newUser = false) {
             },
         });
         const files = null;
-        cl.note("Now, please put in all the files you need for the workspaces (pdf, docx, java, etc.). A dialog should open soon", 'Next steps');
+        cl.note("Now, please put in all the files you need for the workspace (pdf, docx, java, etc.). A dialog should open soon", 'Next steps');
         try {
             const files = await selectFiles();
             return { workspaceName: name, paths: files };
@@ -177,7 +178,7 @@ async function main(newUser = false) {
     async function workspaceOpen(){
         const options = [{value: "goBack", label: "Go back ↩️"}];
 
-        workspaces.forEach((workspace) => {
+        user["workspaces"].forEach((workspace) => {
             options.push({ value: workspace, label: workspace });
         });
 
@@ -191,10 +192,10 @@ async function main(newUser = false) {
             return
             
         cl.outro("Opening...")
-        for (let i = 0; i < newSpace["paths"].length; i++) {
-            const cmd =
-                `start "" "` + newSpace["paths"][i].replaceAll("\\", "\\\\") + `"`;
-            console.log(cmd);
+        for (let i = 0; i <user["workspaces"].indexOf(workspaceChoose) newSpace["paths"].length; i++) {
+            // const cmd =
+            //     `start "" "` + newSpace["paths"][i].replaceAll("\\", "\\\\") + `"`;
+            // console.log(cmd);
             child.exec(cmd, (err, stdout, stderr) => {
                 if (err) {
                     console.error(`exec error: ${err}`);
@@ -208,7 +209,8 @@ async function main(newUser = false) {
         setTimeout(2000)
     }
     let newSpace = null;
-    let workspaces = []
+    user["workspaces"] = []
+    uploadData(user, "users");
 
     console.clear();
     cl.intro(
@@ -221,7 +223,7 @@ async function main(newUser = false) {
 
     if (newUser == false){
         //getting the created workspaces
-        workspaces = retrieveData(user["username"], "users")
+        user["workspaces"] = retrieveData(user["username"], "users")
     }
 
     while (true){
@@ -232,7 +234,7 @@ async function main(newUser = false) {
         ]
 
         if (newUser == false){
-            if (workspaces.length == 0){ //user never created one
+            if (user["workspaces"].length == 0){ //user never created one
                 operation.splice(1, 1);
             }
         } else { //new user so no previous workspace
@@ -250,34 +252,24 @@ async function main(newUser = false) {
             options: operation,
         });
 
-        switch (opAnswer) {
-            default: //Create new workspace
-                newUser = false //new or old user become old when created new workspace
-                newSpace = await workspaceCreation();
-                workspaces.push(newSpace["workspaceName"])
-                user["workspaces"] = workspaces
-                uploadData(user, "users"); //update the user data with the new workspace to MongoDB
-                uploadData(newSpace, "workspaces"); //upload the workspaces data to MongoDB
-                cl.outro("Creation complete!")
-                setTimeout(2000)
-                break;
-            case "openWork":
-                await workspaceOpen()
-                break;
-            case "signOut":
-                reset()
-                return "OK"
+        if (cl.isCancel(opAnswer) || opAnswer == "exit") {
+            reset()
+            return "OK"
+        }
+
+        if  (opAnswer == "openWork"){
+            await workspaceOpen()
+        } else{ //createWork
+            newUser = false //new or old user become old when created new workspace
+            newSpace = await workspaceCreation();
+            user["workspaces"].push(newSpace["workspaceName"])
+            console.log(user["workspaces"])
+            updateData(user["username"], "users", { workspaces: user["workspaces"]})  //update the user data with the new workspace to MongoDB
+            uploadData(newSpace, "workspaces"); //upload the workspaces data to MongoDB
+            cl.outro("Creation complete!")
+            setTimeout(2000)
         }
     }
-    /** 
-    child.exec(`start "" "C:\\Users\\kitty\\Downloads\\Midterm 2 - CS320.pdf"`, (err, stdout, stderr) => {
-      if (err) {
-        console.error(`exec error: ${err}`);
-        return;
-      }
-      //console.log(`stdout: ${stdout}`);
-      //console.error(`stderr: ${stderr}`);
-    });*/
 }
 
 menu().catch(console.error);

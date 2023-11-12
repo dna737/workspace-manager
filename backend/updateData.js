@@ -9,7 +9,7 @@ async function updateData(queryName, collectionName, updatingData) {
 
     try {
         await client.connect();
-        console.log("Connected to MongoDB");
+        //console.log("Connected to MongoDB");
 
         const db = client.db("Workflow_collection");
 
@@ -21,8 +21,9 @@ async function updateData(queryName, collectionName, updatingData) {
         else if (collectionName == "users") query = { username: queryName };
 
         const results = await collection.find(query).toArray();
-        if (results.length == 0)
-            console.log("Data doesn't exist. Skipping update.");
+        if (results.length == 0){
+            //console.log("Data doesn't exist. Skipping update.");
+        }
         else {
 
             // Define the update operation
@@ -38,6 +39,8 @@ async function updateData(queryName, collectionName, updatingData) {
         //console.log("Connection closed");
     }
 }
+
+module.exports = updateData;
 
 // const queryName = '3qliuvbwlriey-esl118';
 // const collectionName = 'workspaces';
