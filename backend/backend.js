@@ -3,7 +3,6 @@ const { MongoClient } = require("mongodb");
 const { collection } = require("./Schemas/Workspace");
 
 async function retrieveData(queryName, collectionName) {
-
     const mongoURI = process.env.MONGO_URI || "-1";
     paths = null;
 
@@ -23,15 +22,14 @@ async function retrieveData(queryName, collectionName) {
         const results = await collection.find(query).toArray();
 
         if (results.length == 0) {
-            console.log("File not found. Returning null.")
-            return paths
+            console.log("File not found. Returning null.");
+            return paths;
         }
 
         for (const result of results) {
             paths = result.paths;
             console.log(paths);
         }
-
     } finally {
         await client.close();
         console.log("Connection closed");
