@@ -11,10 +11,7 @@ async function retrieveUserData(queryName, password) {
     // Create a MongoDB client
     const client = new MongoClient(mongoURI, {});
 
-    returnData = {
-        exist: false,
-        workspaces: null
-    }
+    dataExist = false;
 
     try {
         await client.connect();
@@ -29,23 +26,20 @@ async function retrieveUserData(queryName, password) {
         const results = await collection.find(query).toArray();
 
         if (results.length == 0)
-            console.log("No user found. Returning null")
+            console.log("No user found. Returning false")
         else {
             user = results[0];
-
-            if (user.password === password) {
-                returnData.exist = true;
-                returnData.workspaces = await retrieveData(queryName,"users");
-            }
+            if (user.password === password)
+                dataExist = true;
             else
-                console.log("Invalid password. Returning null");
+                console.log("Invalid password. Returning false");
         }
     } finally {
         await client.close();
         console.log("Connection closed");
     }
-    console.log(returnData);
-    return returnData;
+    console.log(dataExist);
+    return dataExist;
 }
 
-retrieveUserData("hihihigrrb","okokok");
+retrieveUserData("hihihi","kokokok");
