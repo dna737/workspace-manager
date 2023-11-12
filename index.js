@@ -296,3 +296,5 @@ async function main(newUser = false) {
 }
 
 menu().catch(console.error);
+
+// module.exports = main;
