@@ -12,7 +12,6 @@ async function retrieveData(queryName, collectionName) {
 
     try {
         await client.connect();
-        //console.log("Connected to MongoDB");
 
         const db = client.db("Workflow_collection");
 
@@ -32,7 +31,7 @@ async function retrieveData(queryName, collectionName) {
         if (collectionName === "workspaces") {
             for (const result of results) {
                 paths = result.paths;
-                console.log(paths);
+                // console.log(paths);
             }
         } else {
             for (const result of results) {
@@ -46,8 +45,4 @@ async function retrieveData(queryName, collectionName) {
     return paths || workspaces;
 }
 
-//retrieveData("jf83lsi890--workspace2", "workspaces");
-retrieveData("3qliuvbwlriey-esl118", "workspaces");
-// retrieveData("fssfasf", "workspaces");
-//retrieveData("hallu", "users").then((result) => console.log(result));
 module.exports = retrieveData;

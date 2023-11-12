@@ -16,7 +16,6 @@ async function uploadData(jsonData, collectionName) {
 
     try {
         await client.connect();
-        //console.log("Connected to MongoDB");
 
         const db = client.db("Workflow_collection");
 
@@ -25,7 +24,6 @@ async function uploadData(jsonData, collectionName) {
         //Check if data exists
         let query = null;
         if (collectionName === "workspaces") {
-            console.log("entered");
             const id = uuidv4();
             const completeWorkspaceName = id + "" + jsonData.workspaceName;
             jsonData.workspaceName = completeWorkspaceName;
@@ -34,13 +32,9 @@ async function uploadData(jsonData, collectionName) {
             query = { username: jsonData.users };
 
         const results = await collection.find(query).toArray();
-        if (results.length != 0){
-
-        }
-        else {
-            //console.log("jsonData:", jsonData);
+        if (results.length != 0) {
+        } else {
             const result = await collection.insertOne(jsonData);
-            //console.log(`Inserted ${result.insertedCount} documents`);
         }
     } finally {
         await client.close();
