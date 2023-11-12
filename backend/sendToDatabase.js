@@ -22,9 +22,9 @@ async function uploadData(jsonData, collectionName) {
 
         //Check if data exists
         query = null;
-        if (collectionName == "workspaces")
+        if (collectionName === "workspaces")
             query = { workspaceName: jsonData.workspaceName };
-        else if (collectionName == "users")
+        else if (collectionName === "users")
             query = { username: jsonData.workspaceName };
 
         const results = await collection.find(query).toArray();

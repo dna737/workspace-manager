@@ -2,6 +2,7 @@ import * as cl from '@clack/prompts';
 import color from "picocolors";
 import * as child from 'child_process';
 import uploadData from './backend/sendToDatabase.js';
+import { setTimeout } from 'node:timers/promises';
 
 let user = null
 let response = null
@@ -30,8 +31,7 @@ async function accountCreation(){
         cl.cancel('Operation cancelled.');
         return "Restart";
     }
-    user = {"username": username, "password": password}
-    uploadData(user, "users")
+    user = {"username": username, "password": password, "workspaces": []}
     return "OK";
 }
 
@@ -93,15 +93,61 @@ async function menu(){
             break;
     } while (response != "OK")
 
-    await main()
+    await main(true)
 }
 
-async function main(){
+function selectFiles() {
+    return new Promise((resolve, reject) => {
+        child.exec('powershell.exe -NoProfile -ExecutionPolicy Bypass -File chooseFile.ps1', (err, stdout, stderr) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (stderr) {
+                reject(stderr);
+                return;
+            }
+            resolve(stdout.trim().split('\n'));
+        });
+    });
+}
+
+async function workspaceCreation(){
+    const name = await cl.text({ 
+        message: 'Please enter your first workspace 💻',
+        validate(value){
+            if (value.length === 0) return `Workspace is required!`;
+        }, 
+    });
+    const s = cl.spinner();
+    const files = null;
+    s.start('Now, please put in all the files you need for the workspaces (pdf, docx, java, etc.). A dialog should open soon');
+    
+    try {
+        const files = await selectFiles();
+        s.stop();
+        return {"workspaceName" : name, "paths": files}
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+}
+
+async function main(newUser = false){
+    let newSpace = null
     console.clear()
     cl.intro(`${color.bgCyan(color.black("Let's get productive today, " + user["username"] + "💪!"))}`);
-    const workspaces = [];
 
-    const options = ["HI"]
+    if (newUser == true){ //new user
+        newSpace = await workspaceCreation()
+        console.log(`Selected files:`, newSpace);
+        user["workspaces"].push(newSpace["workspaceName"])
+        uploadData(user, "users") //upload the user data with the first workspace to MongoDB
+        uploadData(newSpace, "workspaces") //upload the workspaces data to MongoDB
+    }
+
+    const workspaces = user["workspaces"];
+    const options = []
+
     workspaces.forEach((workspace) => {
         options.push({value: workspace, label: workspace})
     })
@@ -111,29 +157,27 @@ async function main(){
         initialValue: '1',
         options: options,
     })
+    for (let i = 0; i < newSpace["paths"].length; i++) {
+        const cmd = `start "" "` + newSpace["paths"][i].replaceAll("\\","\\\\") +  `"`
+        console.log(cmd)
+        child.exec(cmd, (err, stdout, stderr) => {
+        if (err) {
+            console.error(`exec error: ${err}`);
+            return;
+        }
+        //console.log(`stdout: ${stdout}`);
+        //console.error(`stderr: ${stderr}`);
+        });
+    }
     /** 
-    child.exec(`"C:\\Users\\kitty\\Downloads\\Midterm 2 - CS320.pdf"`, (err, stdout, stderr) => {
+    child.exec(`start "" "C:\\Users\\kitty\\Downloads\\Midterm 2 - CS320.pdf"`, (err, stdout, stderr) => {
       if (err) {
         console.error(`exec error: ${err}`);
         return;
       }
-      console.log(`stdout: ${stdout}`);
-      console.error(`stderr: ${stderr}`);
+      //console.log(`stdout: ${stdout}`);
+      //console.error(`stderr: ${stderr}`);
     });*/
-    child.exec('powershell.exe -NoProfile -ExecutionPolicy Bypass -File chooseFile.ps1', (err, stdout, stderr) => {
-        if (err) {
-            console.error(`Error: ${err}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Stderr: ${stderr}`);
-            return;
-        }
-        const files = stdout.trim().split('\n');
-        console.log(`Selected files:`, files);
-    });
-
-    
 }
 
 menu().catch(console.error);
