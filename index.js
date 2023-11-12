@@ -7,7 +7,6 @@ let response = null
 
 async function accountCreation(){
     cl.intro(`${color.bgYellow(color.red('Great, let start the account creation:'))}`);
-
     const username = await cl.text({ 
         message: 'What is your username:',
         validate(value){
@@ -30,25 +29,12 @@ async function accountCreation(){
         cl.cancel('Operation cancelled.');
         return "Restart";
     }
-    const re_pass = await cl.password({
-        message: 'Please retype password for your account',
-        validate: (value) => {
-            if (!value) return 'Please enter the password you previously typed';
-            if (value != password) return 'The password you typed does not match each other';
-        },
-    });
-    if (cl.isCancel(re_pass)) {
-        cl.cancel('Returning back to main menu');
-        return "Restart";
-    }
-
     user = {"username": username, "password": password}
     return "OK";
 }
 
 async function accountLogIn(){
     cl.intro(`${color.bgYellow(color.red('Welcome back! Please input the following info:'))}`);
-
     const username = await cl.text({ 
         message: 'What is your username:',
         validate(value){
@@ -75,7 +61,7 @@ async function accountLogIn(){
     return "OK";
 }
 
-async function main(){
+async function menu(){
     do {
         console.clear()
         cl.intro(`${color.bgCyan(color.black('Welcome to Workspace Manager app!'))}`);
@@ -84,9 +70,14 @@ async function main(){
                 message: 'Please log in/sign up our service 😍:',
                 options: [
                 { value: 'old', label: 'Log in 🔑', hint: "For those who have created an account before."},
-                { value: 'new', label: 'Sign up 📃', hint: "You are new? Don't worry, just sign up and we will help you!" }
+                { value: 'new', label: 'Sign up 📃', hint: "Newbie? Don't worry, just sign up and we will help you!" }
                 ],
             });
+
+            if (cl.isCancel(account)) {
+                cl.outro(`${color.bgBlue(color.white('Goodbye! -Madhacks Team-'))}`);
+                process.exit(0);
+            }
 
             if (account == "new"){
                 response = await accountCreation();
@@ -99,6 +90,28 @@ async function main(){
         } else 
             break;
     } while (response != "OK")
+
+    await main()
 }
 
-main().catch(console.error);
+async function main(){
+    do {
+        console.clear()
+        cl.intro(`${color.bgCyan(color.black("Let's get productive today, " + user["username"] + "💪!"))}`);
+        const workspaces = ["Saab", "Volvo", "BMW"];
+
+        const options = []
+        workspaces.forEach((workspace) => {
+            options.push({value: answer, label: answer})
+        })
+
+	const answer = await p.select({
+		message: question,
+		initialValue: '1',
+		options: options,
+	})
+    } while (response != "OK")
+    
+}
+
+menu().catch(console.error);
