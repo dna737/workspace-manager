@@ -3,10 +3,12 @@ const Workspace = require("./Schemas/Workspace");
 const User = require("./Schemas/User");
 const MongoClient = require("mongodb").MongoClient;
 
+//TODO: remove this sample workspace later.
 const newWorkspace = new Workspace({
-    workspaceName: "3qliuvbwlriey-esl118",
+    workspaceName: "randomWorkspace",
     paths: ["~/Desktop/essay.txt", "~/Desktop/rubric.txt"],
 });
+
 
 const newUser = new User({
     username: "khoa",
@@ -14,7 +16,8 @@ const newUser = new User({
     workspaces: []
 });
 
-async function uploadData(jsonData, collectionName) {
+
+async function uploadData(jsonData, collectionName, username = "") {
 
     const mongoURI = process.env.MONGO_URI;
 
@@ -22,31 +25,43 @@ async function uploadData(jsonData, collectionName) {
 
     try {
         await client.connect();
-        console.log("Connected to MongoDB");
 
         const db = client.db("Workflow_collection");
 
         const collection = db.collection(collectionName);
-        
+
         //Check if data exists
-        query = null;
-        if (collectionName == "workspaces")
+        let query = null;
+        if (collectionName === "workspaces") {
+            jsonData.workspaceName = username + jsonData.workspaceName;
             query = { workspaceName: jsonData.workspaceName };
-        else if (collectionName == "users")
-            query = { username: jsonData.username};
+
+        } else if (collectionName === "users")
+            jsonData.users = username + jsonData.users;
+        query = { username: jsonData.users };
+
 
         const results = await collection.find(query).toArray();
-        if (results.length != 0)
-            console.log("Data already exists. Skipping upload.");
-        else {
+        if (results.length != 0) {
+        } else {
             const result = await collection.insertOne(jsonData);
-            console.log(`Inserted ${result.insertedCount} documents`);
         }
-        
     } finally {
         await client.close();
-        console.log("Connection closed");
+        //console.log("Connection closed");
     }
 }
 
+
 uploadData(newUser, "users");
+=======
+//TODO: remove this later.
+/** 
+uploadData(
+    { username: "someOtherName", workspaces: ["someWorkspace"] },
+    "users"
+);*/
+
+module.exports = uploadData;
+
+

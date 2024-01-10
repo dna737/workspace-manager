@@ -19,6 +19,7 @@ async function removeData(queryName, collectionName) {
         query = null;
         if (collectionName == "workspaces")
             query = { workspaceName: queryName };
+
         else if (collectionName == "users")
             query = { username: queryName};
 
@@ -29,11 +30,10 @@ async function removeData(queryName, collectionName) {
             const result = await collection.deleteOne(query);
             console.log(`Deleted ${result.deletedCount} document`);
         }
-    }
-    finally {
+    } finally {
         await client.close();
         console.log("Connection closed");
     }
 }
 
-removeData("3qliuvbwlriey-esl118", "workspaces")
+removeData("3qliuvbwlriey-esl118", "workspaces");

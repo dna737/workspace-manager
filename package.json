@@ -1,15 +1,24 @@
 {
-  "name": "workspace-manager",
-  "version": "1.0.0",
+  "name": "this-is-a-random-workspace-manager",
+  "version": "1.0.1",
   "description": "",
+  "type": "module",
   "main": "index.js",
+  "bin": {
+    "openCommandLine": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dna737/workspace-manager"
+  },
   "keywords": [],
-  "author": "",
+  "author": "DavidTheWolfLover, dna737, GauMeow",
   "license": "ISC",
   "dependencies": {
-    "@clack/prompts": "^0.7.0"
+    "@clack/prompts": "^0.7.0",
+    "uuid": "^9.0.1"
   }
 }
