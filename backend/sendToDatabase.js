@@ -1,5 +1,6 @@
 require("dotenv").config();
 const Workspace = require("./Schemas/Workspace");
+const User = require("./Schemas/User");
 const MongoClient = require("mongodb").MongoClient;
 
 //TODO: remove this sample workspace later.
@@ -8,7 +9,16 @@ const newWorkspace = new Workspace({
     paths: ["~/Desktop/essay.txt", "~/Desktop/rubric.txt"],
 });
 
+
+const newUser = new User({
+    username: "khoa",
+    password: "123456",
+    workspaces: []
+});
+
+
 async function uploadData(jsonData, collectionName, username = "") {
+
     const mongoURI = process.env.MONGO_URI;
 
     const client = new MongoClient(mongoURI, {});
@@ -25,9 +35,11 @@ async function uploadData(jsonData, collectionName, username = "") {
         if (collectionName === "workspaces") {
             jsonData.workspaceName = username + jsonData.workspaceName;
             query = { workspaceName: jsonData.workspaceName };
+
         } else if (collectionName === "users")
             jsonData.users = username + jsonData.users;
         query = { username: jsonData.users };
+
 
         const results = await collection.find(query).toArray();
         if (results.length != 0) {
@@ -40,6 +52,9 @@ async function uploadData(jsonData, collectionName, username = "") {
     }
 }
 
+
+uploadData(newUser, "users");
+=======
 //TODO: remove this later.
 /** 
 uploadData(
@@ -48,4 +63,5 @@ uploadData(
 );*/
 
 module.exports = uploadData;
-// uploadData(newWorkspace, "workspaces");
+
+

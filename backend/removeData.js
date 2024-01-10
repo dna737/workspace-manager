@@ -19,7 +19,9 @@ async function removeData(queryName, collectionName) {
         query = null;
         if (collectionName == "workspaces")
             query = { workspaceName: queryName };
-        else if (collectionName == "users") query = { username: queryName };
+
+        else if (collectionName == "users")
+            query = { username: queryName};
 
         const results = await collection.find(query).toArray();
         if (results.length == 0)
